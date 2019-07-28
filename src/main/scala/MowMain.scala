@@ -1,34 +1,50 @@
 import model._
-import scala.io.Source
+import util.FileReaderUtil
 
-object MowMain {
-  def main(args: Array[String]) {
-    val lawn = new Lawn(5, 5)
+object MowMain extends  App {
 
-    val mower = new Mower(new Position(0, 0, lawn.width, lawn.height), Direction.Est)
+    val file  = FileReaderUtil.readFile("task.txt")
+    val head =  FileReaderUtil.head(file) // get first line
+    val body =  FileReaderUtil.body(file) // get all commands
 
-    val mowers = List(mower)
+    val bounds = head.split(" ") // X , Y of Lawn
+    val commands = body.map(l => l.split(" ").filter(e=> e.nonEmpty).toList)
+    // create new Lawn with head line data
+    val lawn = new Lawn(bounds(0).toDouble, bounds(1).toDouble)
 
+    // Calculate nb of mowers from input file
+    val nbMowers =  (file.size  - (file.size % 2)) / 2
+
+  /*
+    var i=0
+    while (i < nbMowers ) {
+      var mower = new Mower(new Position(0, 0, lawn.width, lawn.height), Direction.North)
+      lawn.mowers.::(mower)
+      i+=1
+    }
+    */
+
+    val mower = new Mower(new Position(0, 0, lawn.width, lawn.height), Direction.North)
+    var mowers = List(mower)
     lawn.mowers = mowers
 
-    lawn.toString()
-    val input = Source.fromResource("task.txt")
-    //println(resourcesPath.getLines())
+  commands.zipWithIndex.map{ case (commandList, index) => {
 
-     val list = input.getLines().map(line => {
-       line.split(" ")
-    })
+        if (index % 2 == 0) {
 
-    list.foreach(l => {
-      println(l.toString())
-    })
+          val newPosition= new Position(commandList(0).toDouble, commandList(1).toDouble, lawn.width, lawn.height)
+          mower.direction = Direction.withName(commandList(2))
+          mower.position.move(newPosition.abscissa, newPosition.ordinate)
+          println("Initial position " + ( mower.position , mower.direction) )
+          mower.history.::(mower.position, mower.direction)
 
-    lawn.mowers.foreach(mower => {
-      mower.rotate(RotationEnum.G)
-      mower.rotate(RotationEnum.A)
-      mower.rotate(RotationEnum.G)
-      mower.rotate(RotationEnum.A)
-    })
-    lawn.toString()
+        }else commandList.map(rotationTask => {
+          println("Command execution => " +  rotationTask)
+          val rotation = RotationEnum.withName(rotationTask)
+          mower.rotate(rotation)
+          println("New state => " +  mower.position, mower.direction)
+        })
   }
+  }
+      mower.toString
 }
