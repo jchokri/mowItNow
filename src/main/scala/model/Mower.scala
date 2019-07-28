@@ -2,7 +2,8 @@ package model
 
 case class Mower(var position: Position, var direction: Direction.Value) {
 
-  val history = List((position, direction))
+  var history = List((position, direction)) // save position, direction history
+  var commands: List[List[String]] = List() // list of commands
 
   def rotate(rotation: RotationEnum.Value ) = rotation match {
     case RotationEnum.G => if(this.direction == Direction.Est) this.direction = Direction.apply(0) else this.direction = Direction.apply(this.direction.id+1)
@@ -17,9 +18,8 @@ case class Mower(var position: Position, var direction: Direction.Value) {
   }
 
   override def toString: String = {
-    history.foreach(h => {
-      println(s"=> Mower ${history.indexOf(h) } State : (Position: ${h._1}, Direction: ${h._2}) \t")
-    })
-    return null
+
+    return s"=> (Position: ${this.position}, Direction: ${this.direction}) \t"
+
   }
 }
