@@ -8,7 +8,7 @@ object MowMain extends  App {
   val body =  FileReaderUtil.body(file) // get all commands
 
   val bounds = head.split(" ") // X , Y of Lawn
-  // create new Lawn with head line data
+  // create new Lawn with head line data ### Why it's a var  ?
   var lawn = new Lawn(bounds(0).toDouble, bounds(1).toDouble)
 
   // Calculate nb of mowers from input file and add their on the lawn
